@@ -11,8 +11,8 @@ class ObjectMethodsTest < Mocha::TestCase
 
   def test_should_build_mocha_referring_to_self
     mocha = @object.mocha
-    assert_not_nil mocha
-    assert mocha.is_a?(Mocha::Mock)
+    assert mocha != nil
+    assert_equal Mocha::Mock, (class << mocha; superclass; end)
     assert_equal @object.mocha_inspect, mocha.mocha_inspect
   end
 

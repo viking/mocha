@@ -66,7 +66,8 @@ module Mocha
   # If you want to specify more complex ordering or order invocations across
   # different mock objects, use the {Expectation#in_sequence} method to
   # explicitly define a total or partial ordering of invocations.
-  class Mock
+  class Mock < BasicObject
+    include ObjectMethods
 
     # Adds an expectation that the specified method must be called exactly once with any parameters.
     #
@@ -286,7 +287,7 @@ module Mocha
     # @private
     def method_missing(symbol, *arguments, &block)
       if @responder and not @responder.respond_to?(symbol)
-        raise NoMethodError, "undefined method `#{symbol}' for #{self.mocha_inspect} which responds like #{@responder.mocha_inspect}"
+        raise ::NoMethodError, "undefined method `#{symbol}' for #{self.mocha_inspect} which responds like #{@responder.mocha_inspect}"
       end
       if matching_expectation_allowing_invocation = all_expectations.match_allowing_invocation(symbol, *arguments)
         matching_expectation_allowing_invocation.invoke(&block)
@@ -343,6 +344,25 @@ module Mocha
       @expectations.any?
     end
 
+    # @private
+    def __metaclass__
+      class << self; self; end
+    end
+
+    # @private
+    def extend(mod)
+      __metaclass__.include(mod)
+    end
+
+    # @private
+    def raise(*args)
+      ::Kernel.instance_method(:raise).bind(self).call(*args)
+    end
+
+    # @private
+    def caller(*args)
+      ::Kernel.instance_method(:caller).bind(self).call(*args)
+    end
   end
 
 end

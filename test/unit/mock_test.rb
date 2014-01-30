@@ -41,7 +41,7 @@ class MockTest < Mocha::TestCase
 
   def test_should_be_equal
     mock = build_mock
-    assert_equal true, mock.eql?(mock)
+    assert_equal true, mock.equal?(mock)
   end
 
   if RUBY_VERSION < '1.9'
