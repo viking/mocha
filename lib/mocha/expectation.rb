@@ -15,6 +15,19 @@ module Mocha
   # Methods on expectations returned from {Mock#expects}, {Mock#stubs}, {ObjectMethods#expects} and {ObjectMethods#stubs}.
   class Expectation
 
+    # @private
+    @@sequences = []
+
+    # @private
+    def self.add_sequence(sequence)
+      @@sequences << sequence
+    end
+
+    # @private
+    def self.pop_sequence
+      @@sequences.pop
+    end
+
     # Modifies expectation so that the number of calls to the expected method must be within a specific +range+.
     #
     # @param [Range,Integer] range specifies the allowable range in the number of expected invocations.
@@ -510,6 +523,7 @@ module Mocha
       @return_values = ReturnValues.new
       @yield_parameters = YieldParameters.new
       @backtrace = backtrace || caller
+      in_sequence(*@@sequences)
     end
 
     # @private

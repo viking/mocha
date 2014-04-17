@@ -440,6 +440,18 @@ class ExpectationTest < Mocha::TestCase
     assert_equal [expectation], sequence_two.expectations
   end
 
+  def test_should_auto_constrain_expectation_with_class_sequences
+    sequence_one = FakeSequence.new
+    sequence_two = FakeSequence.new
+    Expectation.add_sequence(sequence_one)
+    Expectation.add_sequence(sequence_two)
+    expectation = Expectation.new(nil, :method_one)
+    Expectation.pop_sequence
+    Expectation.pop_sequence
+    assert_equal [expectation], sequence_one.expectations
+    assert_equal [expectation], sequence_two.expectations
+  end
+
   class FakeState
 
     def initialize

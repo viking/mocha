@@ -123,7 +123,7 @@ module Mocha
 
     # Builds a new sequence which can be used to constrain the order in which expectations can occur.
     #
-    # Specify that an expected invocation must occur within a named {Sequence} by using {Expectation#in_sequence}.
+    # Specify that an expected invocation must occur within a named {Sequence} by using {Expectation#in_sequence} or by passing in a block.
     #
     # @return [Sequence] a new sequence
     #
@@ -137,8 +137,25 @@ module Mocha
     #     expects(:fry).in_sequence(breakfast)
     #     expects(:eat).in_sequence(breakfast)
     #   end
+    #
+    # @example Use a block to automatically add expectations to a sequence.
+    #   egg = mock('egg')
+    #   sequence('breakfast') do
+    #     egg.expects(:crack)
+    #     egg.expects(:fry)
+    #     egg.expects(:eat)
+    #   end
     def sequence(name)
-      Sequence.new(name)
+      sequence = Sequence.new(name)
+      if block_given?
+        Expectation.add_sequence(sequence)
+        begin
+          yield
+        ensure
+          Expectation.pop_sequence
+        end
+      end
+      sequence
     end
 
     # Builds a new state machine which can be used to constrain the order in which expectations can occur.

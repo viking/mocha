@@ -27,6 +27,20 @@ class SequenceTest < Mocha::TestCase
     assert_failed(test_result)
   end
 
+  def test_should_constrain_invocations_to_occur_in_expected_order_in_block_format
+    test_result = run_as_test do
+      mock = mock()
+      sequence('one') do
+        mock.expects(:first)
+        mock.expects(:second)
+      end
+
+      mock.second
+      mock.first
+    end
+    assert_failed(test_result)
+  end
+
   def test_should_allow_invocations_in_sequence
     test_result = run_as_test do
       mock = mock()
